@@ -1,0 +1,259 @@
+{
+  "scenario": "S06",
+  "title": "Instructions then local ticket",
+  "command": "python -m helpdesk.run_scenarios S06",
+  "status_profile": "normal",
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini"
+  },
+  "process_restarts": 0,
+  "process_ids": [
+    25912
+  ],
+  "events": [
+    {
+      "message": "Show me the Wi-Fi troubleshooting steps.",
+      "user_memory_read": {},
+      "nodes_visited": [
+        "start_turn",
+        "load_user_memory",
+        "model",
+        "tools",
+        "model"
+      ],
+      "trace": [
+        {
+          "node": "start_turn",
+          "update": {
+            "model_calls": 0,
+            "tool_calls": 0,
+            "stop_reason": null
+          }
+        },
+        {
+          "node": "load_user_memory",
+          "update": {
+            "user_memory": {}
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "",
+                "tool_requests": [
+                  {
+                    "name": "find_instructions",
+                    "args": {
+                      "topic": "wifi"
+                    }
+                  }
+                ]
+              }
+            ],
+            "model_calls": 1
+          }
+        },
+        {
+          "node": "tools",
+          "update": {
+            "messages": [
+              {
+                "type": "tool_result",
+                "tool": "find_instructions",
+                "result": {
+                  "found": true,
+                  "topic": "wifi",
+                  "instruction_id": "GUIDE-WIFI",
+                  "title": "Connect to the practice campus network",
+                  "steps": [
+                    "Check that Wi-Fi is enabled and airplane mode is off.",
+                    "Select the fictional Campus-Demo network.",
+                    "If connection fails, forget the saved network and try connecting again.",
+                    "If the problem remains, check the service status before preparing a ticket."
+                  ],
+                  "source": "data/helpdesk.json"
+                }
+              }
+            ],
+            "tool_calls": 1
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "Here are the Wi-Fi troubleshooting steps:\n\n1. Check that Wi-Fi is enabled and airplane mode is off.\n2. Select the fictional Campus-Demo network.\n3. If connection fails, forget the saved network and try connecting again.\n4. If the problem remains, check the service status before preparing a ticket.\n\nIf you're still having issues after trying these steps, I can help you prepare a ticket.",
+                "tool_requests": []
+              }
+            ],
+            "model_calls": 2
+          }
+        }
+      ],
+      "tools_used": [
+        "find_instructions"
+      ],
+      "final_reply": "Here are the Wi-Fi troubleshooting steps:\n\n1. Check that Wi-Fi is enabled and airplane mode is off.\n2. Select the fictional Campus-Demo network.\n3. If connection fails, forget the saved network and try connecting again.\n4. If the problem remains, check the service status before preparing a ticket.\n\nIf you're still having issues after trying these steps, I can help you prepare a ticket.",
+      "tickets": [],
+      "loop_limit_reached": false,
+      "user_id": "demo-user-a",
+      "thread_id": "s06",
+      "pid": 25912,
+      "information_sources": {
+        "reference_file": "data/helpdesk.json",
+        "status_snapshot": null,
+        "conversation_state": "checkpointer, thread_id=s06",
+        "user_memory": "nothing saved for this user"
+      }
+    },
+    {
+      "message": "I enabled Wi-Fi and forgot the saved network, but Campus-Demo still will not connect. Check whether Wi-Fi is down. If it is operating, prepare a ticket about this problem.",
+      "user_memory_read": {},
+      "nodes_visited": [
+        "start_turn",
+        "load_user_memory",
+        "model",
+        "tools",
+        "model",
+        "tools",
+        "model"
+      ],
+      "trace": [
+        {
+          "node": "start_turn",
+          "update": {
+            "model_calls": 0,
+            "tool_calls": 0,
+            "stop_reason": null
+          }
+        },
+        {
+          "node": "load_user_memory",
+          "update": {
+            "user_memory": {}
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "",
+                "tool_requests": [
+                  {
+                    "name": "check_service_status",
+                    "args": {
+                      "service": "wifi"
+                    }
+                  }
+                ]
+              }
+            ],
+            "model_calls": 1
+          }
+        },
+        {
+          "node": "tools",
+          "update": {
+            "messages": [
+              {
+                "type": "tool_result",
+                "tool": "check_service_status",
+                "result": {
+                  "service": "wifi",
+                  "status": "operational",
+                  "message": "The demo Wi-Fi service has no reported outage.",
+                  "status_profile": "normal",
+                  "source": "data/service_status.json"
+                }
+              }
+            ],
+            "tool_calls": 1
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "",
+                "tool_requests": [
+                  {
+                    "name": "prepare_ticket",
+                    "args": {
+                      "category": "wifi",
+                      "summary": "Campus-Demo network will not connect.",
+                      "steps_tried": [
+                        "I enabled Wi-Fi and forgot the saved network."
+                      ],
+                      "service_status": "operational",
+                      "only_if_operating": true
+                    }
+                  }
+                ]
+              }
+            ],
+            "model_calls": 2
+          }
+        },
+        {
+          "node": "tools",
+          "update": {
+            "messages": [
+              {
+                "type": "tool_result",
+                "tool": "prepare_ticket",
+                "result": {
+                  "ticket_id": "TKT-20261116-144359-a2e4",
+                  "status": "draft",
+                  "path": "outputs/tickets/TKT-20261116-144359-a2e4.json",
+                  "delivery": "local draft only; nothing was sent"
+                }
+              }
+            ],
+            "tool_calls": 2
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "The Wi-Fi service is operational. I've prepared a ticket regarding your issue with the Campus-Demo network not connecting. \n\n**Ticket ID:** TKT-20261116-144359-a2e4  \n**Status:** Draft (nothing has been sent)\n\nYou can find the draft [here](outputs/tickets/TKT-20261116-144359-a2e4.json). If you need further assistance, feel free to ask!",
+                "tool_requests": []
+              }
+            ],
+            "model_calls": 3
+          }
+        }
+      ],
+      "tools_used": [
+        "check_service_status",
+        "prepare_ticket"
+      ],
+      "final_reply": "The Wi-Fi service is operational. I've prepared a ticket regarding your issue with the Campus-Demo network not connecting. \n\n**Ticket ID:** TKT-20261116-144359-a2e4  \n**Status:** Draft (nothing has been sent)\n\nYou can find the draft [here](outputs/tickets/TKT-20261116-144359-a2e4.json). If you need further assistance, feel free to ask!",
+      "tickets": [
+        "outputs/tickets/TKT-20261116-144359-a2e4.json"
+      ],
+      "loop_limit_reached": false,
+      "user_id": "demo-user-a",
+      "thread_id": "s06",
+      "pid": 25912,
+      "information_sources": {
+        "reference_file": null,
+        "status_snapshot": "normal",
+        "conversation_state": "checkpointer, thread_id=s06",
+        "user_memory": "nothing saved for this user"
+      }
+    }
+  ]
+}

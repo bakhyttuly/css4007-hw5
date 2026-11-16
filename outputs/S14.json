@@ -1,0 +1,110 @@
+{
+  "scenario": "S14",
+  "title": "Password recovery outage",
+  "command": "python -m helpdesk.run_scenarios S14",
+  "status_profile": "recovery_outage",
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini"
+  },
+  "process_restarts": 0,
+  "process_ids": [
+    25912
+  ],
+  "events": [
+    {
+      "message": "My password recovery page is unavailable. Check the service status. Is there a known problem?",
+      "user_memory_read": {},
+      "nodes_visited": [
+        "start_turn",
+        "load_user_memory",
+        "model",
+        "tools",
+        "model"
+      ],
+      "trace": [
+        {
+          "node": "start_turn",
+          "update": {
+            "model_calls": 0,
+            "tool_calls": 0,
+            "stop_reason": null
+          }
+        },
+        {
+          "node": "load_user_memory",
+          "update": {
+            "user_memory": {}
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "",
+                "tool_requests": [
+                  {
+                    "name": "check_service_status",
+                    "args": {
+                      "service": "account_recovery"
+                    }
+                  }
+                ]
+              }
+            ],
+            "model_calls": 1
+          }
+        },
+        {
+          "node": "tools",
+          "update": {
+            "messages": [
+              {
+                "type": "tool_result",
+                "tool": "check_service_status",
+                "result": {
+                  "service": "account_recovery",
+                  "status": "outage",
+                  "message": "The demo account-recovery service is unavailable. The fixture gives no repair time.",
+                  "status_profile": "recovery_outage",
+                  "source": "data/service_status.json"
+                }
+              }
+            ],
+            "tool_calls": 1
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "The password recovery service is currently experiencing an outage, and there is no repair time provided. If you need further assistance, please let me know!",
+                "tool_requests": []
+              }
+            ],
+            "model_calls": 2
+          }
+        }
+      ],
+      "tools_used": [
+        "check_service_status"
+      ],
+      "final_reply": "The password recovery service is currently experiencing an outage, and there is no repair time provided. If you need further assistance, please let me know!",
+      "tickets": [],
+      "loop_limit_reached": false,
+      "user_id": "demo-user-a",
+      "thread_id": "s14",
+      "pid": 25912,
+      "information_sources": {
+        "reference_file": null,
+        "status_snapshot": "recovery_outage",
+        "conversation_state": "checkpointer, thread_id=s14",
+        "user_memory": "nothing saved for this user"
+      }
+    }
+  ]
+}

@@ -1,163 +1,161 @@
-# HW5 — Build a university IT helpdesk with LangGraph
+# CSS-4007 HW5 - University IT helpdesk with LangGraph
 
-**CSS-4007 · Artificial Intelligence**  
-**Due:** 8 November 2026, 23:59 (UTC+5)
+A terminal helpdesk assistant built in four stages with LangGraph. All data is fictional
+(`data/`); tickets are **local drafts only**, nothing is ever sent. The original task text is
+in [ASSIGNMENT.md](ASSIGNMENT.md); my explanations, predictions and results are in
+[SUBMISSION.md](SUBMISSION.md).
 
-## Start from this repository
+| Part | What it is | Needs API key |
+| --- | --- | --- |
+| 1 | Graph with a conditional edge, no LLM (`helpdesk/part1.py`) | no |
+| 2 | Model chooses tools in a ReAct loop with a limit (`helpdesk/agent.py`, `helpdesk/tools.py`) | yes (real runs) |
+| 3 | Conversation memory (thread) + user memory (user), SQLite | yes (real runs) |
+| 4 | Tests + GitHub Actions + this README | no |
 
-1. Fork [ardakshalkar/css4007-hw5](https://github.com/ardakshalkar/css4007-hw5) and keep your fork public, as for the earlier homeworks.
-2. Clone your fork and work there. Do not open a pull request to the starter repository.
-3. Read [SCENARIOS.md](SCENARIOS.md) to see the example conversations and what the finished application should do.
-4. Read [data/README.md](data/README.md), then inspect the supplied JSON files. Use these fixtures for your demonstrations.
-5. Write your code and fill in SUBMISSION.md as you complete the parts. The starter supplies the task and data; you implement the graph, tools, memory and tests.
+## Versions
 
-### Set up your environment
+* Python **3.12.2** (CI uses Python 3.12).
+* Exact package versions are pinned in [requirements.txt](requirements.txt)
+  (LangGraph 1.2.22, langgraph-checkpoint-sqlite 3.1.3, langchain-openai 1.8.0).
+* Real-model runs: provider **OpenAI**, model **gpt-4o-mini**, temperature 0.
 
-Create a virtual environment with python -m venv .venv. Activate it with .venv\Scripts\Activate.ps1 in PowerShell, or source .venv/bin/activate on macOS/Linux. Then run python -m pip install -r requirements.txt.
+## Install
 
-Part 1 needs no API key. For the model parts, copy .env.example to .env and set your key and an available tool-capable model identifier. The dependency list includes the OpenAI adapter; if you choose another provider, replace it with the appropriate adapter and document your setup. The SQLite checkpoint package is supplied for a local storage option; explain your final storage choice.
+Windows (PowerShell):
 
-The starter dependencies are not a tested, pinned environment for a completed application. Pin the versions you actually use once your code runs, and record your Python version. No application entry point is supplied: include your own exact run commands in your README.
-
-## The scenario
-
-A university IT helpdesk receives messages such as “I cannot connect to Wi-Fi” and “I forgot my password.” The assistant should find the relevant instructions, check whether a service is down, and help prepare a support ticket if the problem remains unresolved. When a user returns, it should remember the conversation and their saved preference for the language of replies.
-
-Build this assistant in stages using **LangGraph**. Start with a small program whose route you can explain. Then add model decisions, tools and memory. A terminal application is enough.
-
-This is a practice version of a real helpdesk workflow. Use the supplied fictional helpdesk information and invented users. It does not connect to the university's systems or submit real tickets.
-
-## Part 1 — Understand how a graph makes a decision
-
-First build a small helpdesk graph **without an LLM**. It handles only Wi-Fi questions and password questions.
-
-Your graph must follow this structure:
-
-```text
-START → read_request → choose the next node
-                         ├─ wifi_help     → END
-                         ├─ password_help → END
-                         └─ other_help    → END
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 ```
 
-Use these routing rules:
+macOS / Linux:
 
-- If the message contains `wifi` or `wi-fi`, send it to `wifi_help`.
-- Otherwise, if it contains `password`, send it to `password_help`.
-- Otherwise, send it to `other_help`, which asks the user whether the problem concerns Wi-Fi or a password.
-- Ignore differences between uppercase and lowercase letters.
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
 
-The two help nodes should return the corresponding instructions from `data/helpdesk.json`. Use separate LangGraph nodes and a conditional edge.
+## Configure the model (Parts 2-3 with a real model)
 
-### Decide what your state holds
+```text
+copy .env.example .env        # Windows   (macOS/Linux: cp .env.example .env)
+```
 
-Use at least these fields:
+Edit `.env`:
 
-| Field | What it holds |
-| --- | --- |
-| `message` | The user's original message |
-| `category` | The category identified by `read_request` |
-| `reply` | The response produced by a help node |
+```text
+OPENAI_API_KEY=<your key>
+MODEL_NAME=gpt-4o-mini
+HELPDESK_STORAGE_DIR=local-storage
+```
 
-Before writing code, draw the graph and answer:
+`.env` is ignored by git. **Never commit a key.** Another provider can be used by changing
+`helpdesk/models.py` (`get_real_model`) and the adapter package.
 
-1. What information does each node need to read? What does it change?
-2. What is the difference between a node returning an update to the state and a conditional edge choosing the next node?
-3. Does the next node receive only the previous node's update, or the current graph state?
-4. What do `START`, `END`, and compiling a graph mean in this program?
+## Run
 
-### Predict, run, explain
+**Part 1 (no key):**
 
-Predict the route for each message before running your code:
+```text
+python -m helpdesk.part1_cli --message "I cannot connect to Wi-Fi."
+python -m helpdesk.part1_cli --message "My Wi-Fi password does not work." --variant with_clarification
+python -m helpdesk.part1_cli --all        # S01-S05, logs in outputs/S01.json ... S05.json
+python -m helpdesk.part1_cli --draw       # Mermaid drawings of both graphs into outputs/
+```
 
-- `I cannot connect to Wi-Fi.`
-- `I forgot my PASSWORD.`
-- `My laptop screen is broken.`
-- `My Wi-Fi password does not work.`
+**Interactive helpdesk (model + tools + memory):**
 
-Then run all four. For each run, save the order of nodes and the state after each node. Compare it with your prediction. Explain what happens when a message mentions both Wi-Fi and a password, and which rule causes that result.
+```text
+python -m helpdesk.chat --user demo-user-a --thread t1 --profile normal
+```
 
-Now change the graph: when both topics appear, send the request to a new `clarify_problem` node that asks which problem the user wants to solve first. Show the changed graph and the new execution trace.
+* `--user` is the user identifier (owner of long-term preferences).
+* `--thread` is the conversation identifier. Start the command again with the same `--user` and
+  `--thread` to resume that conversation after closing the program.
+* `--profile` selects the service-status snapshot: `normal`, `wifi_outage`, `recovery_outage`,
+  `status_unavailable`.
 
-Finish by explaining **what LangGraph controls here** and **what your own Python functions decide**. There is no model making decisions in this part.
+**Supplied scenarios S01-S14 (real model):**
 
-## Part 2 — Let a model choose tools
+```text
+python -m helpdesk.part1_cli --all                 # S01-S05
+python -m helpdesk.run_scenarios --part2           # S06, S07, S08, S09, S14
+python -m helpdesk.run_scenarios --part3           # S10, S11, S12, S13
+python -m helpdesk.run_scenarios S11               # one scenario
+```
 
-Extend the same helpdesk with a model that can use three reusable tools:
+Logs are written to `outputs/<ID>.json` (nodes visited, model tool requests, tool results, user
+memory read, final reply, ticket filename, whether the loop limit was reached, process ids).
+Scenarios with a `restart_process` event run each part in a **separate Python process** against
+the same storage files; the `process_ids` field in the log shows this.
 
-| Tool | What it does |
-| --- | --- |
-| `find_instructions` | Looks up Wi-Fi or password instructions in the local helpdesk data |
-| `check_service_status` | Looks up whether the requested service is operating or has a known outage |
-| `prepare_ticket` | Produces a local ticket draft from the problem description and steps already tried |
+The same runner with `--fake` uses the offline test double and writes to `outputs/fake-runs/`.
+Those logs are **not** real-model results.
 
-Each tool must work when called directly, without the agent. Then connect the tools to the model through your graph. A ticket is a draft saved locally; no message is sent to a real helpdesk.
+## Where memory is stored and how to clear it
 
-Show one request that needs more than one tool. For example: “Wi-Fi still does not work after I followed the instructions. Is it down? If it is working, help me prepare a ticket.” The assistant's choice should depend on the tool results.
+| Memory | LangGraph component | Key | File |
+| --- | --- | --- | --- |
+| Conversation (messages, steps tried) | SQLite checkpointer | `thread_id` | `local-storage/checkpoints.sqlite` |
+| User preferences (reply language) | SQLite store, namespace `("preferences", user_id)` | `user_id` | `local-storage/user_memory.sqlite` |
 
-Draw the execution loop: the model requests a tool, your program runs it, its result returns to the model, and the model either continues or answers. Include a limit so the loop cannot run forever, and explain where you enforce it.
+`local-storage/` is git-ignored (so are `*.sqlite`). Ticket drafts are JSON files in
+`outputs/tickets/` (invented demo data only).
 
-In `SUBMISSION.md`, explain:
+Clear all saved memory and start again:
 
-1. How does the graph decide between running a tool and ending with an answer?
-2. Which component requests a tool, and which component actually executes it?
-3. What changes in the state after a tool result returns?
-4. What makes this part different from the fixed routing rules in Part 1?
+```text
+python -m helpdesk.storage --reset
+```
 
-Save an actual run showing the model requests, tool results, and final answer. State which model and provider you used. Use the supplied service-status snapshots to show that the same conditional request leads to different behaviour when Wi-Fi is operating, down, or its status is unknown. See SCENARIOS.md for the interactions.
+(or delete the `local-storage` folder). The scenario runner does this automatically before
+each scenario (`reset_before`).
 
-## Part 3 — Remember the user and the conversation
+## Tests
 
-Add two separate kinds of memory:
+```text
+python -m pytest -q
+```
 
-- **Conversation memory:** the current problem, previous messages and steps already tried in this conversation.
-- **User memory:** a saved preference, such as “reply in Kazakh,” that is available in a later conversation for the same invented user.
+53 tests, no API key. Model behaviour is replaced by `helpdesk/fake_model.py`, a small
+rule-based double that is **labelled as not an LLM** in its name, its docstring and in every
+log it produces.
 
-Use a LangGraph checkpointer to save conversation state, and persistent storage for the user preference. Explain what a `thread_id` identifies and how it differs from a user identifier. Memory must survive closing and restarting the program.
+| File | What it checks | What it would catch if the code broke |
+| --- | --- | --- |
+| `tests/test_routing.py` | The four Part 1 messages take the predicted route; matching ignores case; mixed Wi-Fi + password goes to `wifi_help` in the original graph and to `clarify_problem` in the changed graph; help text comes from `helpdesk.json` | A changed keyword rule, case-sensitive matching, the wrong rule order, a broken clarification branch, help text no longer read from the data file |
+| `tests/test_tools.py` | Each tool called directly: instructions lookup, all four status snapshots, ticket draft contents/uniqueness, refusal of missing details and of secrets, argument validation | Tools that only work through the agent, a status read from the wrong snapshot, tickets with invented fields, tickets saved without the user's steps, passwords written into tickets |
+| `tests/test_agent.py` | The conditional ticket request behaves differently for operating / outage / unknown; password problems check `account_recovery`; missing details lead to a question; the model cannot pick the status snapshot; the loop limit stops a model that never stops and the budget resets each turn; code blocks conditional or unrequested tickets even if the model ignores the rule; the ticket records the real status | A loop that can run forever, always creating a ticket, the model overriding trusted context, a ticket created in an outage or when the user never asked, a budget that is not reset between messages |
+| `tests/test_memory.py` | Preference saved per user; a conversation survives closing and reopening the storage (and a real process restart); a new thread of the same user has the preference but not the old conversation; another user sees nothing; the model cannot choose whose memory is written; reset clears everything; invalid language values are rejected | Memory kept only in RAM, thread and user memory mixed up, one user's preference leaking to another, a hard-coded preference, reset that does not clear |
 
-Demonstrate these situations:
+## CI
 
-1. A user reports a Wi-Fi problem, then says “I already tried that.” The assistant uses the earlier messages to understand what “that” means.
-2. Close the program and start it again. Resume the same conversation with its previous state.
-3. Start a new conversation for the same invented user. The saved language preference is available, while the previous conversation is a separate thread.
-4. Start a conversation for a different invented user. The first user's preference must not appear.
+[.github/workflows/tests.yml](.github/workflows/tests.yml) runs `pytest` on every push and pull
+request (Ubuntu, Python 3.12, pinned requirements). It needs no secrets and uses the fake model.
+The real-model runs of Parts 2-3 are made by hand and saved in `outputs/`.
 
-For each demonstration, show what was read from conversation memory, user memory, or the helpdesk reference file. Explain why looking up Wi-Fi instructions is retrieval, while recalling the user's chosen language is memory.
+## Project layout
 
-## Part 4 — Make it easy for someone else to run your work
+```text
+helpdesk/part1.py        Part 1 graph (original + with_clarification), tracing
+helpdesk/part1_cli.py    Part 1 command line / scenarios S01-S05
+helpdesk/tools.py        find_instructions, check_service_status, prepare_ticket, remember_language_preference
+helpdesk/agent.py        model + tools graph, loop limit, memory loading
+helpdesk/storage.py      SQLite checkpointer + store, reset
+helpdesk/memory.py       user preference store helpers
+helpdesk/models.py       real model setup (OpenAI) / fake model switch
+helpdesk/fake_model.py   offline test double (NOT an LLM)
+helpdesk/chat.py         interactive terminal chat
+helpdesk/run_scenarios.py scenario runner with real process restarts
+data/                    supplied fictional fixtures
+outputs/                 saved logs and ticket drafts
+tests/                   pytest suite
+```
 
-This means another person can download your code, follow your instructions, and run the same demonstrations on their computer.
+## Privacy
 
-In your repository:
-
-1. Add a `README.md` with the exact steps to install the required packages, configure a model API key, start the program, and run the examples. State your Python version.
-2. Include a dependency file with the package versions you used. Do not make the reader guess which LangGraph version works with your code.
-3. Explain where memory files are saved and how to clear them to start again.
-4. Add tests that check routing, the three tools, saved memory after a restart, and separation between users and conversations. Explain what each test would catch if the code broke.
-5. Set up GitHub Actions to run these tests automatically whenever you push changes. This is continuous integration, or CI. The tests must work without a private model API key; you may substitute a clearly labelled fake model in tests. Keep the real model demonstration from Part 2 separate.
-6. Commit as you complete each stage, with messages explaining what changed.
-
-Keep API keys in environment variables or an ignored `.env` file. Do not commit keys, live memory databases, or personal information. Use invented identifiers such as `demo-user-a` and `demo-user-b` in your saved examples.
-
-## Demonstrate the finished application
-
-Run S01–S14 from data/scenarios.json. Follow reset and restart events as explained in data/README.md. Fill in the scenario table in SUBMISSION.md and save your own logs. SCENARIOS.md shows the expected user experience; it is not a set of measured results.
-
-## What to hand in
-
-Submit your repository link. It should contain:
-
-- Your LangGraph code for all four parts.
-- `SUBMISSION.md` with your drawings, explanations and predictions compared with actual runs.
-- Small execution logs in `outputs/` showing which nodes and tools ran and what changed in the state.
-- Setup instructions, a dependency file, tests and the GitHub Actions workflow.
-
-Push your finished work to your public fork and submit its link on the LMS. The exact HW5 LMS submission destination is still to be provided by the professor.
-
-## References
-
-- [LangGraph Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api)
-- [LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)
-- [LangGraph memory](https://docs.langchain.com/oss/python/langgraph/add-memory)
-
-
+Only invented identifiers (`demo-user-a`, `demo-user-b`) are used. Keys live in `.env`
+(ignored). Memory databases live in `local-storage/` (ignored). Tickets must not contain
+passwords or recovery codes; `prepare_ticket` rejects them.

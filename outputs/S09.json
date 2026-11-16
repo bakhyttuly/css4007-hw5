@@ -1,0 +1,167 @@
+{
+  "scenario": "S09",
+  "title": "Missing ticket details",
+  "command": "python -m helpdesk.run_scenarios S09",
+  "status_profile": "normal",
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini"
+  },
+  "process_restarts": 0,
+  "process_ids": [
+    8280
+  ],
+  "events": [
+    {
+      "message": "Prepare a support ticket.",
+      "user_memory_read": {},
+      "nodes_visited": [
+        "start_turn",
+        "load_user_memory",
+        "model"
+      ],
+      "trace": [
+        {
+          "node": "start_turn",
+          "update": {
+            "model_calls": 0,
+            "tool_calls": 0,
+            "stop_reason": null
+          }
+        },
+        {
+          "node": "load_user_memory",
+          "update": {
+            "user_memory": {}
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "Could you please provide a description of the problem you're experiencing and the steps you've already tried? This information is necessary to prepare the ticket.",
+                "tool_requests": []
+              }
+            ],
+            "model_calls": 1
+          }
+        }
+      ],
+      "tools_used": [],
+      "final_reply": "Could you please provide a description of the problem you're experiencing and the steps you've already tried? This information is necessary to prepare the ticket.",
+      "tickets": [],
+      "loop_limit_reached": false,
+      "user_id": "demo-user-a",
+      "thread_id": "s09",
+      "pid": 8280,
+      "information_sources": {
+        "reference_file": null,
+        "status_snapshot": null,
+        "conversation_state": "checkpointer, thread_id=s09",
+        "user_memory": "nothing saved for this user"
+      }
+    },
+    {
+      "message": "The issue is Wi-Fi. I enabled it and tried reconnecting, but it still fails.",
+      "user_memory_read": {},
+      "nodes_visited": [
+        "start_turn",
+        "load_user_memory",
+        "model",
+        "tools",
+        "model"
+      ],
+      "trace": [
+        {
+          "node": "start_turn",
+          "update": {
+            "model_calls": 0,
+            "tool_calls": 0,
+            "stop_reason": null
+          }
+        },
+        {
+          "node": "load_user_memory",
+          "update": {
+            "user_memory": {}
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "I'll prepare a ticket with the information you've provided. \n\nHere's what I have:\n- **Problem Description:** Wi-Fi issue.\n- **Steps Tried:** Enabled Wi-Fi and tried reconnecting.\n\nI'll proceed to prepare the ticket now.",
+                "tool_requests": [
+                  {
+                    "name": "prepare_ticket",
+                    "args": {
+                      "category": "wifi",
+                      "summary": "Wi-Fi issue.",
+                      "steps_tried": [
+                        "Enabled Wi-Fi and tried reconnecting."
+                      ],
+                      "service_status": "not_checked"
+                    }
+                  }
+                ]
+              }
+            ],
+            "model_calls": 1
+          }
+        },
+        {
+          "node": "tools",
+          "update": {
+            "messages": [
+              {
+                "type": "tool_result",
+                "tool": "prepare_ticket",
+                "result": {
+                  "ticket_id": "TKT-20261116-144640-c38b",
+                  "status": "draft",
+                  "path": "outputs/tickets/TKT-20261116-144640-c38b.json",
+                  "delivery": "local draft only; nothing was sent"
+                }
+              }
+            ],
+            "tool_calls": 1
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "The support ticket has been prepared as a local draft. Here are the details:\n\n- **Ticket ID:** TKT-20261116-144640-c38b\n- **Status:** Draft\n- **File Path:** outputs/tickets/TKT-20261116-144640-c38b.json\n\nNothing has been sent yet. If you need further assistance or want to check the service status, let me know!",
+                "tool_requests": []
+              }
+            ],
+            "model_calls": 2
+          }
+        }
+      ],
+      "tools_used": [
+        "prepare_ticket"
+      ],
+      "final_reply": "The support ticket has been prepared as a local draft. Here are the details:\n\n- **Ticket ID:** TKT-20261116-144640-c38b\n- **Status:** Draft\n- **File Path:** outputs/tickets/TKT-20261116-144640-c38b.json\n\nNothing has been sent yet. If you need further assistance or want to check the service status, let me know!",
+      "tickets": [
+        "outputs/tickets/TKT-20261116-144640-c38b.json"
+      ],
+      "loop_limit_reached": false,
+      "user_id": "demo-user-a",
+      "thread_id": "s09",
+      "pid": 8280,
+      "information_sources": {
+        "reference_file": null,
+        "status_snapshot": null,
+        "conversation_state": "checkpointer, thread_id=s09",
+        "user_memory": "nothing saved for this user"
+      }
+    }
+  ]
+}

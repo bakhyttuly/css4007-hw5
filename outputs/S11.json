@@ -1,0 +1,190 @@
+{
+  "scenario": "S11",
+  "title": "Persist and recall after restart",
+  "command": "python -m helpdesk.run_scenarios S11",
+  "status_profile": "normal",
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini"
+  },
+  "process_restarts": 1,
+  "process_ids": [
+    10864,
+    29832
+  ],
+  "events": [
+    {
+      "message": "Please remember that I prefer replies in Kazakh. My issue is Wi-Fi. I enabled it and tried reconnecting, but it still fails.",
+      "user_memory_read": {},
+      "nodes_visited": [
+        "start_turn",
+        "load_user_memory",
+        "model",
+        "tools",
+        "model"
+      ],
+      "trace": [
+        {
+          "node": "start_turn",
+          "update": {
+            "model_calls": 0,
+            "tool_calls": 0,
+            "stop_reason": null
+          }
+        },
+        {
+          "node": "load_user_memory",
+          "update": {
+            "user_memory": {}
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "",
+                "tool_requests": [
+                  {
+                    "name": "remember_language_preference",
+                    "args": {
+                      "language": "Kazakh"
+                    }
+                  },
+                  {
+                    "name": "find_instructions",
+                    "args": {
+                      "topic": "wifi"
+                    }
+                  }
+                ]
+              }
+            ],
+            "model_calls": 1
+          }
+        },
+        {
+          "node": "tools",
+          "update": {
+            "messages": [
+              {
+                "type": "tool_result",
+                "tool": "remember_language_preference",
+                "result": {
+                  "saved": true,
+                  "preference": "reply_language",
+                  "value": "Kazakh"
+                }
+              },
+              {
+                "type": "tool_result",
+                "tool": "find_instructions",
+                "result": {
+                  "found": true,
+                  "topic": "wifi",
+                  "instruction_id": "GUIDE-WIFI",
+                  "title": "Connect to the practice campus network",
+                  "steps": [
+                    "Check that Wi-Fi is enabled and airplane mode is off.",
+                    "Select the fictional Campus-Demo network.",
+                    "If connection fails, forget the saved network and try connecting again.",
+                    "If the problem remains, check the service status before preparing a ticket."
+                  ],
+                  "source": "data/helpdesk.json"
+                }
+              }
+            ],
+            "tool_calls": 2
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "Мен сіздің жауаптарыңызды қазақ тілінде беруді есте сақтадым. \n\nWi-Fi мәселесіне қатысты, сіз Wi-Fi-ды қосып, қайта қосылуға тырысқаныңызды айттыңыз. Міне, Wi-Fi-ды жөндеу үшін бірнеше қадам:\n\n1. Wi-Fi-дың қосылғанына және ұшақ режимінің өшірілгеніне көз жеткізіңіз.\n2. \"Campus-Demo\" желісін таңдаңыз.\n3. Егер қосылу сәтсіз болса, сақталған желіні ұмытуды және қайта қосылуға тырысыңыз.\n4. Егер мәселе шешілмесе, билет дайындамас бұрын қызметтің күйін тексеріңіз.\n\nЕгер мәселе шешілмесе, мен сіз үшін билет дайындай аламын.",
+                "tool_requests": []
+              }
+            ],
+            "model_calls": 2
+          }
+        }
+      ],
+      "tools_used": [
+        "remember_language_preference",
+        "find_instructions"
+      ],
+      "final_reply": "Мен сіздің жауаптарыңызды қазақ тілінде беруді есте сақтадым. \n\nWi-Fi мәселесіне қатысты, сіз Wi-Fi-ды қосып, қайта қосылуға тырысқаныңызды айттыңыз. Міне, Wi-Fi-ды жөндеу үшін бірнеше қадам:\n\n1. Wi-Fi-дың қосылғанына және ұшақ режимінің өшірілгеніне көз жеткізіңіз.\n2. \"Campus-Demo\" желісін таңдаңыз.\n3. Егер қосылу сәтсіз болса, сақталған желіні ұмытуды және қайта қосылуға тырысыңыз.\n4. Егер мәселе шешілмесе, билет дайындамас бұрын қызметтің күйін тексеріңіз.\n\nЕгер мәселе шешілмесе, мен сіз үшін билет дайындай аламын.",
+      "tickets": [],
+      "loop_limit_reached": false,
+      "user_id": "demo-user-a",
+      "thread_id": "restart-a",
+      "pid": 10864,
+      "information_sources": {
+        "reference_file": "data/helpdesk.json",
+        "status_snapshot": null,
+        "conversation_state": "checkpointer, thread_id=restart-a",
+        "user_memory": "nothing saved for this user"
+      }
+    },
+    {
+      "message": "Which problem and steps did we discuss?",
+      "user_memory_read": {
+        "language": "Kazakh"
+      },
+      "nodes_visited": [
+        "start_turn",
+        "load_user_memory",
+        "model"
+      ],
+      "trace": [
+        {
+          "node": "start_turn",
+          "update": {
+            "model_calls": 0,
+            "tool_calls": 0,
+            "stop_reason": null
+          }
+        },
+        {
+          "node": "load_user_memory",
+          "update": {
+            "user_memory": {
+              "language": "Kazakh"
+            }
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "Біз Wi-Fi мәселесін талқыладық. Сіз Wi-Fi-ды қосып, қайта қосылуға тырысқаныңызды айттыңыз.",
+                "tool_requests": []
+              }
+            ],
+            "model_calls": 1
+          }
+        }
+      ],
+      "tools_used": [],
+      "final_reply": "Біз Wi-Fi мәселесін талқыладық. Сіз Wi-Fi-ды қосып, қайта қосылуға тырысқаныңызды айттыңыз.",
+      "tickets": [],
+      "loop_limit_reached": false,
+      "user_id": "demo-user-a",
+      "thread_id": "restart-a",
+      "pid": 29832,
+      "information_sources": {
+        "reference_file": null,
+        "status_snapshot": null,
+        "conversation_state": "checkpointer, thread_id=restart-a",
+        "user_memory": {
+          "language": "Kazakh"
+        }
+      }
+    }
+  ]
+}

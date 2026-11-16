@@ -1,0 +1,167 @@
+{
+  "scenario": "S10",
+  "title": "Use the current conversation",
+  "command": "python -m helpdesk.run_scenarios S10",
+  "status_profile": "normal",
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini"
+  },
+  "process_restarts": 0,
+  "process_ids": [
+    26716
+  ],
+  "events": [
+    {
+      "message": "I cannot connect to Wi-Fi. I enabled it and forgot the saved network, but reconnecting failed.",
+      "user_memory_read": {},
+      "nodes_visited": [
+        "start_turn",
+        "load_user_memory",
+        "model",
+        "tools",
+        "model"
+      ],
+      "trace": [
+        {
+          "node": "start_turn",
+          "update": {
+            "model_calls": 0,
+            "tool_calls": 0,
+            "stop_reason": null
+          }
+        },
+        {
+          "node": "load_user_memory",
+          "update": {
+            "user_memory": {}
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "",
+                "tool_requests": [
+                  {
+                    "name": "find_instructions",
+                    "args": {
+                      "topic": "wifi"
+                    }
+                  }
+                ]
+              }
+            ],
+            "model_calls": 1
+          }
+        },
+        {
+          "node": "tools",
+          "update": {
+            "messages": [
+              {
+                "type": "tool_result",
+                "tool": "find_instructions",
+                "result": {
+                  "found": true,
+                  "topic": "wifi",
+                  "instruction_id": "GUIDE-WIFI",
+                  "title": "Connect to the practice campus network",
+                  "steps": [
+                    "Check that Wi-Fi is enabled and airplane mode is off.",
+                    "Select the fictional Campus-Demo network.",
+                    "If connection fails, forget the saved network and try connecting again.",
+                    "If the problem remains, check the service status before preparing a ticket."
+                  ],
+                  "source": "data/helpdesk.json"
+                }
+              }
+            ],
+            "tool_calls": 1
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "Here are the troubleshooting steps for connecting to Wi-Fi:\n\n1. Check that Wi-Fi is enabled and airplane mode is off.\n2. Select the fictional Campus-Demo network.\n3. If connection fails, forget the saved network and try connecting again.\n4. If the problem remains, check the service status before preparing a ticket.\n\nIf you're still having trouble after trying these steps, I can prepare a ticket for you. Let me know!",
+                "tool_requests": []
+              }
+            ],
+            "model_calls": 2
+          }
+        }
+      ],
+      "tools_used": [
+        "find_instructions"
+      ],
+      "final_reply": "Here are the troubleshooting steps for connecting to Wi-Fi:\n\n1. Check that Wi-Fi is enabled and airplane mode is off.\n2. Select the fictional Campus-Demo network.\n3. If connection fails, forget the saved network and try connecting again.\n4. If the problem remains, check the service status before preparing a ticket.\n\nIf you're still having trouble after trying these steps, I can prepare a ticket for you. Let me know!",
+      "tickets": [],
+      "loop_limit_reached": false,
+      "user_id": "demo-user-a",
+      "thread_id": "s10",
+      "pid": 26716,
+      "information_sources": {
+        "reference_file": "data/helpdesk.json",
+        "status_snapshot": null,
+        "conversation_state": "checkpointer, thread_id=s10",
+        "user_memory": "nothing saved for this user"
+      }
+    },
+    {
+      "message": "Which steps did I already try?",
+      "user_memory_read": {},
+      "nodes_visited": [
+        "start_turn",
+        "load_user_memory",
+        "model"
+      ],
+      "trace": [
+        {
+          "node": "start_turn",
+          "update": {
+            "model_calls": 0,
+            "tool_calls": 0,
+            "stop_reason": null
+          }
+        },
+        {
+          "node": "load_user_memory",
+          "update": {
+            "user_memory": {}
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "You mentioned that you enabled Wi-Fi and forgot the saved network, but reconnecting failed. Would you like me to prepare a ticket with this information?",
+                "tool_requests": []
+              }
+            ],
+            "model_calls": 1
+          }
+        }
+      ],
+      "tools_used": [],
+      "final_reply": "You mentioned that you enabled Wi-Fi and forgot the saved network, but reconnecting failed. Would you like me to prepare a ticket with this information?",
+      "tickets": [],
+      "loop_limit_reached": false,
+      "user_id": "demo-user-a",
+      "thread_id": "s10",
+      "pid": 26716,
+      "information_sources": {
+        "reference_file": null,
+        "status_snapshot": null,
+        "conversation_state": "checkpointer, thread_id=s10",
+        "user_memory": "nothing saved for this user"
+      }
+    }
+  ]
+}

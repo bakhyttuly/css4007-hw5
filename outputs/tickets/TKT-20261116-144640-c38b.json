@@ -1,0 +1,18 @@
+{
+  "ticket": {
+    "ticket_id": "TKT-20261116-144640-c38b",
+    "status": "draft",
+    "user_id": "demo-user-a",
+    "thread_id": "s09",
+    "category": "wifi",
+    "summary": "Wi-Fi issue.",
+    "steps_tried": [
+      "Enabled Wi-Fi and tried reconnecting."
+    ],
+    "service_status": "not_checked",
+    "status_profile": null,
+    "reference_ids": [
+      "GUIDE-WIFI"
+    ]
+  }
+}

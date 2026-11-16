@@ -1,0 +1,110 @@
+{
+  "scenario": "S07",
+  "title": "The same request during a Wi-Fi outage",
+  "command": "python -m helpdesk.run_scenarios S07",
+  "status_profile": "wifi_outage",
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini"
+  },
+  "process_restarts": 0,
+  "process_ids": [
+    25912
+  ],
+  "events": [
+    {
+      "message": "I enabled Wi-Fi and forgot the saved network, but Campus-Demo still will not connect. Check whether Wi-Fi is down. If it is operating, prepare a ticket about this problem.",
+      "user_memory_read": {},
+      "nodes_visited": [
+        "start_turn",
+        "load_user_memory",
+        "model",
+        "tools",
+        "model"
+      ],
+      "trace": [
+        {
+          "node": "start_turn",
+          "update": {
+            "model_calls": 0,
+            "tool_calls": 0,
+            "stop_reason": null
+          }
+        },
+        {
+          "node": "load_user_memory",
+          "update": {
+            "user_memory": {}
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "",
+                "tool_requests": [
+                  {
+                    "name": "check_service_status",
+                    "args": {
+                      "service": "wifi"
+                    }
+                  }
+                ]
+              }
+            ],
+            "model_calls": 1
+          }
+        },
+        {
+          "node": "tools",
+          "update": {
+            "messages": [
+              {
+                "type": "tool_result",
+                "tool": "check_service_status",
+                "result": {
+                  "service": "wifi",
+                  "status": "outage",
+                  "message": "The demo Wi-Fi service is unavailable across campus. The fixture gives no repair time.",
+                  "status_profile": "wifi_outage",
+                  "source": "data/service_status.json"
+                }
+              }
+            ],
+            "tool_calls": 1
+          }
+        },
+        {
+          "node": "model",
+          "update": {
+            "messages": [
+              {
+                "type": "ai",
+                "content": "The Wi-Fi service is currently down across campus, and there is no repair time available. Therefore, I cannot prepare a ticket for your connection issue. If you need further assistance, please let me know!",
+                "tool_requests": []
+              }
+            ],
+            "model_calls": 2
+          }
+        }
+      ],
+      "tools_used": [
+        "check_service_status"
+      ],
+      "final_reply": "The Wi-Fi service is currently down across campus, and there is no repair time available. Therefore, I cannot prepare a ticket for your connection issue. If you need further assistance, please let me know!",
+      "tickets": [],
+      "loop_limit_reached": false,
+      "user_id": "demo-user-a",
+      "thread_id": "s07",
+      "pid": 25912,
+      "information_sources": {
+        "reference_file": null,
+        "status_snapshot": "wifi_outage",
+        "conversation_state": "checkpointer, thread_id=s07",
+        "user_memory": "nothing saved for this user"
+      }
+    }
+  ]
+}

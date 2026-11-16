@@ -1,0 +1,51 @@
+{
+  "scenario": "S04",
+  "title": "Two topics before the graph change",
+  "command": "python -m helpdesk.part1_cli --scenario S04",
+  "graph_variant": "original",
+  "status_profile": "normal",
+  "model_used": null,
+  "events": [
+    {
+      "message": "My Wi-Fi password does not work.",
+      "nodes_visited": [
+        "read_request",
+        "wifi_help"
+      ],
+      "trace": [
+        {
+          "node": "read_request",
+          "update": {
+            "category": "wifi"
+          },
+          "state_after": {
+            "message": "My Wi-Fi password does not work.",
+            "category": "wifi"
+          }
+        },
+        {
+          "node": "wifi_help",
+          "update": {
+            "reply": "Connect to the practice campus network [GUIDE-WIFI]\n  1. Check that Wi-Fi is enabled and airplane mode is off.\n  2. Select the fictional Campus-Demo network.\n  3. If connection fails, forget the saved network and try connecting again.\n  4. If the problem remains, check the service status before preparing a ticket."
+          },
+          "state_after": {
+            "message": "My Wi-Fi password does not work.",
+            "category": "wifi",
+            "reply": "Connect to the practice campus network [GUIDE-WIFI]\n  1. Check that Wi-Fi is enabled and airplane mode is off.\n  2. Select the fictional Campus-Demo network.\n  3. If connection fails, forget the saved network and try connecting again.\n  4. If the problem remains, check the service status before preparing a ticket."
+          }
+        }
+      ],
+      "final_state": {
+        "message": "My Wi-Fi password does not work.",
+        "category": "wifi",
+        "reply": "Connect to the practice campus network [GUIDE-WIFI]\n  1. Check that Wi-Fi is enabled and airplane mode is off.\n  2. Select the fictional Campus-Demo network.\n  3. If connection fails, forget the saved network and try connecting again.\n  4. If the problem remains, check the service status before preparing a ticket."
+      },
+      "final_reply": "Connect to the practice campus network [GUIDE-WIFI]\n  1. Check that Wi-Fi is enabled and airplane mode is off.\n  2. Select the fictional Campus-Demo network.\n  3. If connection fails, forget the saved network and try connecting again.\n  4. If the problem remains, check the service status before preparing a ticket.",
+      "user_id": "demo-user-a",
+      "thread_id": "s04",
+      "information_source": {
+        "reference_file": "data/helpdesk.json"
+      }
+    }
+  ]
+}
